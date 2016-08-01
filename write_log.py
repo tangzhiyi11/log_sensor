@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+#product log into file
+
 import time
 
 def main():
