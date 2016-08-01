@@ -7,6 +7,7 @@ import os
 import Queue
 import commands
 
+#count file line nums
 def read_linenum(file_path):
     command = 'wc -l ' + file_path
     status,output = commands.getstatusoutput(command)
@@ -15,19 +16,22 @@ def read_linenum(file_path):
     else:
         return 0
 
+#read logs from logfile
 def read_log(file_path,data):
     f = open(file_path,'r')
     num = 0
     while True:
         current_lines = read_linenum(file_path)
-        while num < current_lines:
-            log = f.readline()
-            num += 1
-            print "read_log : %s" % log
-            data.put(log)
+        if num < int(current_lines):
+            while num < int(current_lines):
+                log = f.readline().strip()
+                num += 1
+                print "read log:{log}".format(log=log)
+                data.put(log)
         time.sleep(5)
     f.close()
 
+#write logs into local file
 def write_log(result_path,result):
     while True:
         if result.empty():
@@ -36,10 +40,11 @@ def write_log(result_path,result):
             f = open(result_path,'a')
             while not result.empty():
                 log = result.get()
-                print 'write log form queue: %s' % log
+                print 'write log from queue: %s' % log
                 f.write(log+'\n')
             f.close()
 
+#parse logs and put into result queue
 def parse_log(data,result):
     while True:
         if data.empty():
@@ -66,7 +71,6 @@ def main():
     for t in threads:
         t.start()
 
-    print "all is done!"
 
 if __name__ == "__main__":
     main()
